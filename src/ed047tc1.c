@@ -7,10 +7,10 @@
 #include "i2s_data_bus.h"
 #include "rmt_pulse.h"
 
+#include <soc/gpio_struct.h>  // GPIO.out_w1ts / GPIO.out_w1tc — needed for fast GPIO in ESP32 Arduino core 3.x
 #include <xtensa/core-macros.h>
 
 #include <string.h>
-#include <hal/gpio_ll.h>
 
 /******************************************************************************/
 /***        macro definitions                                               ***/

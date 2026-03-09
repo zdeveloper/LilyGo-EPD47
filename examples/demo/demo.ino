@@ -375,7 +375,7 @@ void loop()
             return;
         }
 
-        uint8_t touched = touch.getPoint(&x, &y);
+        uint8_t touched = touch.getPoint(&x, &y, 1);
         if (touched) {
 
             // When reading the battery voltage, POWER_EN must be turned on

@@ -62,6 +62,8 @@ int vref = 1100;
 char buf[128];
 uint32_t touch_loop_interval = 0;
 bool found_rtc = false;
+bool ntp_synced = false;
+bool rtc_synced = false;
 
 struct _point {
     uint8_t buttonID;
@@ -87,7 +89,7 @@ void WiFiGotIP(WiFiEvent_t event, WiFiEventInfo_t info)
 void timeavailable(struct timeval *t)
 {
     Serial.println("[WiFi]: Got time adjustment from NTP!");
-    rtc.hwClockWrite();
+    ntp_synced = true;
 }
 
 
@@ -162,7 +164,7 @@ void setup()
     esp_adc_cal_characteristics_t adc_chars;
     esp_adc_cal_value_t val_type = esp_adc_cal_characterize(
                                        ADC_UNIT_2,
-                                       ADC_ATTEN_DB_11,
+                                       ADC_ATTEN_DB_12,
                                        ADC_WIDTH_BIT_12,
                                        1100,
                                        &adc_chars
@@ -308,6 +310,12 @@ void setup()
 
 void loop()
 {
+    // Check if NTP time is synced and RTC is not synced
+    if (ntp_synced && !rtc_synced) {
+        rtc_synced = true;
+        // Sync RTC with NTP time
+        rtc.hwClockWrite();
+    }
 
     if (millis() > interval) {
         interval = millis() + 10000;
@@ -344,7 +352,8 @@ void loop()
         struct tm timeinfo;
         // Get the time C library structure
         rtc.getDateTime(&timeinfo);
-        strftime(buf, 64, "➸ %b %d %Y %H:%M:%S", &timeinfo);
+        strftime(buf, 128, "➸ %b %d %Y %H:%M:%S", &timeinfo);
+        snprintf(buf, 128, "%s %s", buf, ntp_synced ? "😀" : "😢");
         writeln((GFXfont *)&FiraSans, buf, &cursor_x, &cursor_y, NULL);
 
         /**
@@ -375,7 +384,7 @@ void loop()
             return;
         }
 
-        uint8_t touched = touch.getPoint(&x, &y);
+        uint8_t touched = touch.getPoint(&x, &y, 1);
         if (touched) {
 
             // When reading the battery voltage, POWER_EN must be turned on

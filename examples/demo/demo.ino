@@ -349,10 +349,16 @@ void loop()
         // For more formats, please refer to :
         // https://man7.org/linux/man-pages/man3/strftime.3.html
 
-        struct tm timeinfo;
+        struct tm timeinfo = {0};
         // Get the time C library structure
         rtc.getDateTime(&timeinfo);
-        strftime(buf, 128, "➸ %b %d %Y %H:%M:%S", &timeinfo);
+        snprintf(buf, sizeof(buf), "➸ %04d-%02d-%02d %02d:%02d:%02d",
+                 timeinfo.tm_year + 1900,
+                 timeinfo.tm_mon + 1,
+                 timeinfo.tm_mday,
+                 timeinfo.tm_hour,
+                 timeinfo.tm_min,
+                 timeinfo.tm_sec);
         snprintf(buf, 128, "%s %s", buf, ntp_synced ? "😀" : "😢");
         writeln((GFXfont *)&FiraSans, buf, &cursor_x, &cursor_y, NULL);
 

@@ -176,9 +176,9 @@ void setup()
     epd_init();
     epd_poweron();
     epd_clear();
+    delay(3000);
     renderText(currentPage);
     epd_poweroff();
-    delay(3000);
 
     // // Set up a timer to wake up after 3 seconds (time in microseconds)
     // esp_sleep_enable_timer_wakeup(3 * 1000000);

@@ -71,7 +71,7 @@ void renderText(uint8_t page)
     // delay(100);
     // delay(100);
 }
-`
+
 void handleTouch()
 {
     if (touchOnline && !screenBusy)
